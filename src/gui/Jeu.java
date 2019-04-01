@@ -15,8 +15,7 @@ public class Jeu {
 					UI frame = new UI();
 					new Thread(frame).start();
 					frame.setVisible(true);
-					
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
