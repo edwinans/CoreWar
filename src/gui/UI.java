@@ -5,9 +5,12 @@ import core.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
@@ -26,6 +29,7 @@ public class UI extends JFrame implements Runnable {
 	public static int vitesseSlider;
 	private JPanel[][] grid;
 	private JLabel cycles;
+	private int wi = 0;
 	private JLabel lblMemoireUtilise1;
 	private JLabel lblMemoireUtilise2;
 	private JLabel instructions1J1;
@@ -42,9 +46,11 @@ public class UI extends JFrame implements Runnable {
 
 	/**
 	 * Création de la fenêtre
+	 * 
+	 * @throws IOException
 	 */
 
-	public UI() {
+	public UI() throws IOException {
 		core = new Core();
 		setTitle("CoreWar3");
 
@@ -77,7 +83,7 @@ public class UI extends JFrame implements Runnable {
 					core.chargerJoueur(file1, core.getPlacementJ1());
 				} catch (FileNotFoundException | CoreException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					finDuJeu("Le joueur 1 a perdu car:\n" + e.getMessage());
 				}
 			}
 		});
@@ -95,8 +101,7 @@ public class UI extends JFrame implements Runnable {
 				try {
 					core.chargerJoueur(file2, core.getPlacementJ2());
 				} catch (FileNotFoundException | CoreException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					finDuJeu("Le joueur 2 a perdu car:\n" + e.getMessage());
 				}
 			}
 		});
@@ -141,7 +146,7 @@ public class UI extends JFrame implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				core.suspend();
-				core=new Core();
+				core = new Core();
 			}
 
 		});
@@ -162,23 +167,18 @@ public class UI extends JFrame implements Runnable {
 		});
 		contentPane.add(btnPlay);
 
-		// Configuration du JSlider "vitesse"
-		JSlider slider = new JSlider();
-		slider.setMinorTickSpacing(50);
-		slider.setValue(0);
-		slider.setPaintTicks(true);
-		slider.setSnapToTicks(true);
-		slider.setBounds(700, 45, 190, 29);
-		slider.addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				vitesseSlider = slider.getValue();
-				// TODO Auto-generated method stub
-
-			}
-		});
-		contentPane.add(slider);
+		/*
+		 * // Configuration du JSlider "vitesse" JSlider slider = new JSlider();
+		 * slider.setMinorTickSpacing(50); slider.setValue(0);
+		 * slider.setPaintTicks(true); slider.setSnapToTicks(true);
+		 * slider.setBounds(700, 45, 190, 29); slider.addChangeListener(new
+		 * ChangeListener() {
+		 * 
+		 * @Override public void stateChanged(ChangeEvent e) { vitesseSlider =
+		 * slider.getValue(); // TODO Auto-generated method stub
+		 * 
+		 * } }); contentPane.add(slider);
+		 */
 
 		// Jlabels
 		JLabel lblVitesse = new JLabel("Vitesse :");
@@ -203,6 +203,30 @@ public class UI extends JFrame implements Runnable {
 		lblInstructionsJoueur_1.setBounds(700, 424, 271, 23);
 		contentPane.add(lblInstructionsJoueur_1);
 
+		BufferedImage myPicture = ImageIO.read(new File("./images/runningRabit.png"));
+		JButton picButton = new JButton(new ImageIcon(myPicture));
+		picButton.setBounds(700, 17, 60, 60);
+
+		picButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (wi == 0)
+					core.delay = 1000;
+				else if (wi == 1)
+					core.delay = 500;
+				else if (wi == 2)
+					core.delay = 200;
+				else if (wi == 3)
+					core.delay = 50;
+				else if (wi == 4)
+					core.delay = 8;
+				wi++;
+				wi %= 5;
+			}
+		});
+		contentPane.add(picButton);
+
 		initGrid();
 		initCycles();
 		initInstructionsJ1();
@@ -216,8 +240,12 @@ public class UI extends JFrame implements Runnable {
 			for (int j = 0; j < 64; j++) {
 				if (data[i][j] == 1)
 					grid[i][j].setBackground(Color.RED);
+				else if (data[i][j] == 11)
+					grid[i][j].setBackground(new Color(0xff4d4d));
 				else if (data[i][j] == 2)
 					grid[i][j].setBackground(Color.BLUE);
+				else if (data[i][j] == 22)
+					grid[i][j].setBackground(new Color(0x8080ff));
 				else if (data[i][j] == 3)
 					grid[i][j].setBackground(new Color(150, 150, 150));
 				else
@@ -345,6 +373,10 @@ public class UI extends JFrame implements Runnable {
 		}
 	}
 
+	public static void finDuJeu(String msg) {
+		JOptionPane.showMessageDialog(null, msg, "Fin du jeu", JOptionPane.INFORMATION_MESSAGE);
+	}
+
 	public void run() {
 
 		try {
@@ -362,7 +394,7 @@ public class UI extends JFrame implements Runnable {
 			}
 
 		} catch (Exception e) {
-			System.out.println(e);
+			System.err.println(e);
 		}
 	}
 

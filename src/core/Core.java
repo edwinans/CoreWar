@@ -23,7 +23,7 @@ public class Core implements Runnable {
 	public int cyclesToDie;
 	private int placementJ1; // placement dans la grille du J1 dans le Core
 	private int placementJ2;// placement dans la grille du J2 dans le Core
-	private int delay;
+	public int delay = 1000;
 
 	Instruction instruction;
 	public Thread startThread;
@@ -72,10 +72,9 @@ public class Core implements Runnable {
 //Thread executé une fois que le bouton "lancer" est appuyé
 	@SuppressWarnings("deprecation")
 	public void run() {
-		try {
+		boolean whoIsTurn = true; // true=1 , false=2;
 
-//			chargerJoueur(UI.file1, placementJ1);
-//			chargerJoueur(UI.file2, placementJ2);
+		try {
 
 			ArrayList<Integer> indexJ1 = new ArrayList<Integer>();
 			ArrayList<Integer> indexJ2 = new ArrayList<Integer>();
@@ -83,12 +82,16 @@ public class Core implements Runnable {
 			indexJ2.add(placementJ2);
 
 			for (int i = 0; i < maxCycles; i++) {
+				whoIsTurn = true;
 
-				setDelay(UI.vitesseSlider);
+				// setDelay(UI.vitesseSlider);
+
 				for (int ind : indexJ1)
-					colorGrid[ind] = 1;
+					colorGrid[ind] = 11;
 				for (int ind : indexJ2)
-					colorGrid[ind] = 2;
+					colorGrid[ind] = 22;
+				colorGrid[indexJ1.get(0)] = 1;
+				colorGrid[indexJ2.get(0)] = 2;
 
 				updateMem();
 
@@ -96,6 +99,8 @@ public class Core implements Runnable {
 				placementJ1 = indexJ1.get(0);
 				instruction = new Instruction(core[placementJ1]);
 				insJ1.add(instruction.toString());
+
+				whoIsTurn = false;
 
 				indexJ2 = Interpreter.execute(core, placementJ2);
 				placementJ2 = indexJ2.get(0);
@@ -114,9 +119,14 @@ public class Core implements Runnable {
 				}
 
 			}
-			System.out.println("match nul , egalite entre les joueurs");
+			UI.finDuJeu("Math Nul");
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			String msg = e.getMessage();
+			if (whoIsTurn)
+				msg = "Le joueur 1 a perdu car:\n" + msg;
+			else
+				msg = "Le joueur 2 a perdu car:\n" + msg;
+			UI.finDuJeu(msg);
 		}
 	}
 

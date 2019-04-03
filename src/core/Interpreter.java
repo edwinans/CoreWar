@@ -54,12 +54,14 @@ public class Interpreter {
 				throw new CoreException("Le mode d'addressage est incorrect!");
 			int ans = aOperand + bOperand;
 			core[bAddress] = ans;
+			indexArray.add(bAddress);
 			break;
 		case 3:// SUB
 			if (ins.getBMode() == 1)
 				throw new CoreException("Le mode d'addressage est incorrect!");
 			int ans1 = aOperand - bOperand;
 			core[bAddress] = ans1;
+			indexArray.add(bAddress);
 			break;
 		case 4:// JMP
 			nextIndex = aAddress;
@@ -82,18 +84,21 @@ public class Interpreter {
 				throw new CoreException("Le mode d'addressage est incorrect!");
 			int ans2 = aOperand * bOperand;
 			core[bAddress] = ans2;
+			indexArray.add(bAddress);
 			break;
 		case 9:// DIV
 			if (ins.getBMode() == 1)
 				throw new CoreException("Le mode d'addressage est incorrect!");
 			int ans3 = aOperand / bOperand;
 			core[bAddress] = ans3;
+			indexArray.add(bAddress);
 			break;
 		case 10:// MOD
 			if (ins.getBMode() == 1)
 				throw new CoreException("Le mode d'addressage est incorrect!");
 			int ans4 = aOperand % bOperand;
 			core[bAddress] = ans4;
+			indexArray.add(bAddress);
 			break;
 		case 11:// NOP
 			break;
@@ -115,6 +120,8 @@ public class Interpreter {
 			if (aOperand != bOperand)
 				nextIndex++;
 			break;
+		default:
+			throw new CoreException("Le commande n'existe pas!");
 		}
 
 		indexArray.add(0, nextIndex);

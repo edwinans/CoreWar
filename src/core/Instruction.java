@@ -16,23 +16,28 @@ public class Instruction {
 	}
 
 	public Instruction(String code) throws CoreException {
-		String[] tokens = code.split(" ");
-		if (tokens.length < 2 || tokens.length > 3)
-			throw new CoreException("Le nombre de paramètres est incorrect");
+		try {
+			String[] tokens = code.split(" ");
+			if (tokens.length < 2 || tokens.length > 3)
+				throw new CoreException("Le nombre de paramètres est incorrect");
 
-		opCode = redCodeToInt(tokens[0]);
+			opCode = redCodeToInt(tokens[0]);
 
-		String first = tokens[1];
-		aMode = hasMode(first);
-		first = (aMode == 0) ? first : first.substring(1);
-		aField = (Integer.valueOf(first) + 4096) % 4096;
+			String first = tokens[1];
+			aMode = hasMode(first);
+			first = (aMode == 0) ? first : first.substring(1);
+			aField = (Integer.valueOf(first) + 4096) % 4096;
 
-		if (tokens.length == 3) {
-			String second = tokens[2];
-			bMode = hasMode(second);
-			second = (bMode == 0) ? second : second.substring(1);
-			bField = (Integer.valueOf(second) + 4096) % 4096;
+			if (tokens.length == 3) {
+				String second = tokens[2];
+				bMode = hasMode(second);
+				second = (bMode == 0) ? second : second.substring(1);
+				bField = (Integer.valueOf(second) + 4096) % 4096;
+			}
+		} catch (NumberFormatException e) {
+			throw new CoreException("Les parametres ne sont pas des entiers!");
 		}
+
 	}
 
 	public Instruction(int code) {
